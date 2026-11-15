@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>siduron</title>
+<title>סידור לימות החול</title>
+<meta name="description" content="סידור לימות החול – עדות המזרח, ספרד ואשכנז. תפילות, סדרים, זמני היום וחיזוק יומי.">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#FAF9F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1F29" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="סידור">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Noto+Serif+Hebrew:wght@400;700&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
@@ -253,8 +261,8 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
 .lv-share svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);background:var(--ink);color:var(--sheet);padding:10px 18px;border-radius:12px;font-family:"Assistant",Arial,sans-serif;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translate(-50%,0)}
-.home-compass{position:absolute;top:16px;left:64px}
-.home-compass svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round}
+.home-compass{position:absolute;top:16px;left:64px;width:36px;height:36px;padding:0;display:grid;place-items:center}
+.home-compass svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round}
 .cbody{padding:8px 18px 18px;text-align:center}
 .csub{color:var(--muted);font-size:13px;margin:4px 0 14px}
 .cdial{position:relative;width:min(240px,64vw);aspect-ratio:1;margin:0 auto;border-radius:50%;border:2px solid var(--line);background:radial-gradient(circle,var(--sheet) 60%,var(--chip,rgba(0,0,0,.03)))}
@@ -1326,7 +1334,7 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
       const diff=Math.abs(((b-h)%360+540)%360-180);
       const ok=diff<=5;
       $('cdial').classList.toggle('ok',ok);
-      $('cstat').textContent=ok?'הטלפון מכוון לכיוון המקדש':'סובבו את הטלפון עד שהחץ יצביע למעלה';
+      $('cstat').textContent=ok?'הטלפון מכוון לכיוון המקדש':'החץ מורה לכיוון בית המקדש';
       if (ok && !cAligned){ try{ navigator.vibrate && navigator.vibrate(40); }catch(e){} }
       cAligned=ok;
     }
@@ -1375,6 +1383,10 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
   cdlg.addEventListener('close',stopOrient);
 
   if (state.p) openPrayer(state.p); else if (['extras','learn','prefs'].includes(h)) showTab(h); else showHome();
+  // ---- PWA: register the service worker (only on the real site, not inside previews/iframes) ----
+  if ('serviceWorker' in navigator && location.protocol==='https:' && window.top===window.self && /(^|\.)sidduron\.com$/.test(location.hostname)){
+    window.addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+  }
 })();
 </script>
 </body>
