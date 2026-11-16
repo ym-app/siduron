@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "appinventor.ai_yonimixx.Siduron",
+        "sha256_cert_fingerprints": ["8F:BF:1A:79:2E:D1:6B:0D:F3:E7:96:46:00:82:4B:BF:0D:15:2C:4C:EA:58:5A:B4:92:4C:DA:0A:F3:E5:FA:AC"]
+      }
+    }]
