@@ -1285,7 +1285,7 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
 
   applyFs(); applyNotes();
   // ---- share & contact ----
-  const SHARE_URL='';            // קישור לחנות האפליקציות – יתווסף בהמשך
+  const SHARE_URL='https://sidduron.com/';   // הקישור לשיתוף הסידור
   const CONTACT_EMAIL='yonixdev@gmail.com';        // כתובת המייל לדיווחים
   const NUS_NAME={edot:'עדות המזרח',sefard:'ספרד',ashkenaz:'אשכנז'};
   function toast(msg){
@@ -1311,7 +1311,14 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
     return secs[i] ? secs[i].t : '';
   }
   $('sharebtn').addEventListener('click',shareSiddur);
-  $('lvshare').addEventListener('click',shareSiddur);
+  async function shareLearn(){
+    const c=getLearn();
+    if (!c || !c.url){ toast('הסרטון היומי עדיין לא נטען'); return; }
+    const text=['חיזוק יומי'+(c.title?': '+c.title:''), c.ded||'', 'לצפייה: https://sidduron.com/#learn', '', 'מתוך סידור לימות החול'].filter((x,i)=>x||i===3).join('\n');
+    try{ if (navigator.share){ await navigator.share({title:'חיזוק יומי'+(c.title?' – '+c.title:''),text}); return; } }catch(e){ if (e && e.name==='AbortError') return; }
+    try{ await navigator.clipboard.writeText(text); toast('הקישור הועתק'); }catch(e){ toast('לא ניתן לשתף במכשיר זה'); }
+  }
+  $('lvshare').addEventListener('click',shareLearn);
   $('contactbtn').addEventListener('click',()=>sendMail('סידור – דיווח על טעות או הצעה','נוסח: '+NUS_NAME[state.n]+'\n\nתוכן הפנייה:\n'));
   $('reportbtn').addEventListener('click',()=>{
     const name=(PRAYERS.find(x=>x[0]===state.p)||['',''])[1], sec=currentSection();
