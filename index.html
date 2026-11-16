@@ -933,25 +933,36 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
     $('bnav').hidden=false; document.body.classList.add('has-bnav');
     document.querySelectorAll('#bnav button').forEach(b=>b.setAttribute('aria-current', b.dataset.tab===tab ? 'page' : 'false'));
   }
-  function showTab(tab){
-    if (tab==='home') return showHome();
+  function showTab(tab,fromPop){
+    if (tab==='home') return showHome(fromPop);
     state.p=null; setTab(tab); if (tab==='prefs') syncPrefs(); if (tab==='learn') loadLearn();
     document.title={extras:'תפילות וסדרים',learn:'חיזוק יומי',prefs:'הגדרות'}[tab]+' – סידור לימות החול';
-    try{ history.replaceState(null,'','#'+tab); }catch(e){}
+    try{
+      const d=(history.state&&history.state.d)||0;
+      if (fromPop) {}
+      else if (d>0 && history.state.v!=='prayer') history.replaceState({v:tab,d},'','#'+tab);
+      else history.pushState({v:tab,d:d+1},'','#'+tab);
+    }catch(e){}
     window.scrollTo({top:0,behavior:'auto'});
   }
   document.querySelectorAll('#bnav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
-  function showHome(){
+  function showHome(fromPop){
+    const hd=(history.state&&history.state.d)||0;
+    if (!fromPop && hd>0){ try{ history.go(-hd); return; }catch(e){} }
     state.p=null;
     setTab('home');
     document.title='סידור לימות החול';
-    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    try{ history.replaceState({v:'home',d:0},'',location.pathname+location.search); }catch(e){}
     renderHome(); updateHebrewDate();
     window.scrollTo({top:0,behavior:'auto'});
   }
   let FROM='home';
-  function goBack(){ if (FROM==='extras') showTab('extras'); else showHome(); }
-  function openPrayer(p){
+  function goBack(){
+    if (((history.state&&history.state.d)||0)>0) { history.back(); return; }
+    if (FROM==='extras') showTab('extras'); else showHome();
+  }
+  function openPrayer(p,fromPop){
+    if (!fromPop){ try{ const d=(history.state&&history.state.d)||0; history.pushState({v:'prayer',p,d:d+1},'','#'+state.n+'-'+p); }catch(e){} }
     state.p=p; pauseLearn();
     TABS.forEach(k=>{ $(k).hidden=true; });
     $('bnav').hidden=true; document.body.classList.remove('has-bnav');
@@ -1072,7 +1083,7 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
     document.body.classList.toggle('xprayer', !PRAYERS.slice(0,HOME_N).some(x=>x[0]===state.p));
     $('psub').textContent = NUSACH[state.n];
     document.title = label + ' – ' + NUSACH[state.n];
-    try{ history.replaceState(null,'','#'+state.n+'-'+state.p); }catch(e){}
+    try{ history.replaceState(history.state,'','#'+state.n+'-'+state.p); }catch(e){}
 
     const frag=document.createDocumentFragment();
     let toc='';
@@ -1382,7 +1393,20 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
   cdlg.addEventListener('click',e=>{ if (e.target===cdlg) cdlg.close(); });
   cdlg.addEventListener('close',stopOrient);
 
-  if (state.p) openPrayer(state.p); else if (['extras','learn','prefs'].includes(h)) showTab(h); else showHome();
+  // history: home is the base entry; tabs/prayers are pushed on top, so Android "back" steps back one screen
+  try{ history.scrollRestoration='manual'; }catch(e){}
+  { const startP=state.p;
+    try{ history.replaceState({v:'home',d:0},'',location.pathname+location.search); }catch(e){}
+    showHome(true);
+    if (startP) openPrayer(startP); else if (['extras','learn','prefs'].includes(h)) showTab(h); }
+  window.addEventListener('popstate',e=>{
+    const s=e.state;
+    if (document.getElementById('cdlg') && document.getElementById('cdlg').open) document.getElementById('cdlg').close();
+    if (!s || s.v==='home') showHome(true);
+    else if (s.v==='prayer' && DATA[state.n][s.p]) openPrayer(s.p,true);
+    else if (['extras','learn','prefs'].includes(s.v)) showTab(s.v,true);
+    else showHome(true);
+  });
   // ---- PWA: register the service worker (only on the real site, not inside previews/iframes) ----
   if ('serviceWorker' in navigator && location.protocol==='https:' && window.top===window.self && /(^|\.)sidduron\.com$/.test(location.hostname)){
     window.addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
