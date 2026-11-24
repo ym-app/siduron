@@ -281,6 +281,7 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
 .cdial.ok~.cstat{color:var(--gold);font-weight:700}
 .cgo{margin-top:12px}
 .chint{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.5}
+.updbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:110;background:var(--tekhelet);color:#fff;border:0;border-radius:12px;padding:11px 18px;font-family:"Assistant",Arial,sans-serif;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer;max-width:92vw}
 </style>
 </head>
 <body>
@@ -1417,6 +1418,13 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
   // ---- PWA: register the service worker (only on the real site, not inside previews/iframes) ----
   if ('serviceWorker' in navigator && location.protocol==='https:' && window.top===window.self && /(^|\.)sidduron\.com$/.test(location.hostname)){
     window.addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+    navigator.serviceWorker.addEventListener('message',e=>{
+      if (!e.data || e.data.type!=='sidduron-updated' || document.getElementById('updbar')) return;
+      const bar=document.createElement('button'); bar.id='updbar'; bar.type='button'; bar.className='updbar';
+      bar.textContent='גרסה חדשה של הסידור זמינה – לחצו לרענון';
+      bar.addEventListener('click',()=>location.reload());
+      document.body.appendChild(bar);
+    });
   }
 })();
 </script>
