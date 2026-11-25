@@ -282,6 +282,7 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
 .cgo{margin-top:12px}
 .chint{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.5}
 .updbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:110;background:var(--tekhelet);color:#fff;border:0;border-radius:12px;padding:11px 18px;font-family:"Assistant",Arial,sans-serif;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer;max-width:92vw}
+.appver{text-align:center;color:var(--muted);font-size:12px;margin:22px 0 8px;font-family:"Assistant",Arial,sans-serif;direction:rtl;unicode-bidi:plaintext;opacity:.85}
 </style>
 </head>
 <body>
@@ -416,6 +417,7 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
       <div class="prow"><span class="plab">איפוס הגדרות<small>החזרת כל ההגדרות לברירת המחדל</small></span>
         <button type="button" class="pbtn" id="resetbtn">איפוס</button></div>
     </div>
+    <div class="appver" id="appver"></div>
   </div>
 </div>
 <nav class="bnav" id="bnav" aria-label="ניווט ראשי">
@@ -1285,6 +1287,9 @@ body.is-ayt .txt p.ayt.aytl{font-weight:400;color:inherit}
   applyTheme();
 
   applyFs(); applyNotes();
+  // ---- version line (bottom of settings); build and hash are stamped automatically when the file is prepared ----
+  const APP_VERSION='3.0.0', APP_BUILD=1, APP_HASH='0c214fa';
+  $('appver').textContent='גרסה '+APP_VERSION+' ('+APP_BUILD+') · '+APP_HASH;
   // ---- share & contact ----
   const SHARE_URL='https://sidduron.com/';   // הקישור לשיתוף הסידור
   const CONTACT_EMAIL='yonixdev@gmail.com';        // כתובת המייל לדיווחים
